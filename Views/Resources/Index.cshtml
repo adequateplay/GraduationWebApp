@@ -1,0 +1,59 @@
+﻿@model IEnumerable<GraduationWebApp.Models.Resources>
+
+@{
+    ViewData["Title"] = "Ресурсы";
+}
+
+<h1>Ресурсы</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-dark text-white">Добавить</a>
+</p>
+<div class="container-fluid d-flex align-items-center justify-content-center">
+    <div class="card">
+<div class="table-responsive">
+    <table class="table table-dark table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Имя
+            </th>
+            <th>
+                Описание
+            </th>
+            <th>
+                Тип
+            </th>
+            <th>
+               Файл
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ResourceType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ResourceFile)
+            </td>
+            <td>
+                                <a asp-action="Edit" class="btn btn-outline-success" asp-route-id="@item.ResourceId">Изменить</a> |
+                                <a asp-action="Details" class="btn btn-outline-success"  asp-route-id="@item.ResourceId">Подробнее</a> |
+                <a asp-action="Delete" class="btn btn-outline-success" asp-route-id="@item.ResourceId">Удалить</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</div>
+</div>
+</div>
