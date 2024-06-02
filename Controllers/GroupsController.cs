@@ -1,10 +1,12 @@
 ﻿using GraduationWebApp.Data;
 using GraduationWebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GraduationWebApp.Controllers
 {
+    [Authorize(Roles = "Админ")]
     public class GroupsController : Controller
     {
         private readonly ApplicationDbContext _context;

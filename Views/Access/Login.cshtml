@@ -1,0 +1,31 @@
+﻿
+@model GraduationWebApp.Models.Users;
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+</head>
+<body>
+    <form asp-controller="Access" asp-action="Login" method="post">
+        <h1>Login</h1>
+        <input type="email" placeholder="Почта" asp-for="Email" />
+        <input type="password" placeholder="Пароль" asp-for="Password" />
+
+        <input type="submit" value="Войти" class="btn btn-primary" />
+
+        @if (ViewData["ValidateMessage"] != null)
+        {
+            <br />
+            <br />
+            <label>@ViewData["ValidateMessage"]</label>
+        }
+
+    </form>
+</body>
+</html>

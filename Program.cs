@@ -1,6 +1,8 @@
 using GraduationWebApp.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Extensions.Options;
 
 namespace GraduationWebApp
 {
@@ -15,6 +17,16 @@ namespace GraduationWebApp
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+            builder.Services.AddAuthentication(
+    CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(option => {
+        option.LoginPath = "/Access/Login";
+        option.AccessDeniedPath = "/Access/Login";
+        option.LogoutPath = "/";
+        option.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+
+    });
 
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -39,6 +51,18 @@ namespace GraduationWebApp
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.Use(async (context, next) =>
+            {
+                if (!context.User.Identity.IsAuthenticated &&
+                    context.Request.Path.StartsWithSegments("/Groups")) // Проверяем, пытается ли пользователь получить доступ к вкладке группы
+                {
+                    context.Response.Redirect("/Access/Login"); // Перенаправляем на вашу страницу входа
+                    return;
+                }
+
+                await next();
+            });
             app.UseAuthorization();
 
             app.MapControllerRoute(
