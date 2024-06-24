@@ -1,0 +1,69 @@
+﻿@model GraduationWebApp.Models.Users
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav flex-column nav-pills  bg-dark" id="profileTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link text-white active" id="profile-tab" data-bs-toggle="pill" href="#profile" role="tab" aria-controls="profile" aria-selected="true">Профиль</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" id="email-tab" data-bs-toggle="pill" href="#email" role="tab" aria-controls="email" aria-selected="false">Почта</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" id="password-tab" data-bs-toggle="pill" href="#password" role="tab" aria-controls="password" aria-selected="false">Смена пароля</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" id="personal-info-tab" data-bs-toggle="pill" href="#personal-info" role="tab" aria-controls="personal-info" aria-selected="false">Персональные данные</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-9">
+            <div class="tab-content" id="profileTabsContent">
+                <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                    <h3>Профиль</h3>
+                    <p><strong>Роль:</strong> @Model.Role</p>
+                    <p><strong>Дата регистрации:</strong> @Model.RegistrationDate.ToShortDateString()</p>
+                </div>
+                <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+                    <h3>Почта</h3>
+                    <form asp-action="UpdateEmail" method="post">
+                        <div class="form-group">
+                            <label for="newEmail">Почта</label>
+                            <input type="email" class="form-control" id="newEmail" name="newEmail" value="@Model.Email" required />
+                        </div>
+                        <button type="submit" class="btn btn-dark text-white mt-5">Обновить почту</button>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
+                    <h3>Смена пароля</h3>
+                    <form asp-action="ChangePassword" method="post">
+                        <div class="form-group">
+                            <label for="oldPassword">Текущий пароль</label>
+                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">Новый пароль</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" required />
+                        </div>
+                        <button type="submit" class="btn btn-dark text-white mt-5">Изменить пароль</button>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="personal-info" role="tabpanel" aria-labelledby="personal-info-tab">
+                    <h3>Персональные данные</h3>
+                    <form asp-action="UpdatePersonalInfo" method="post">
+                        <div class="form-group">
+                            <label for="firstName">Имя</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" value="@Model.FirstName" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Фамилия</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" value="@Model.LastName" required />
+                        </div>
+                        <button type="submit" class="btn btn-dark text-white mt-5">Обновить данные</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

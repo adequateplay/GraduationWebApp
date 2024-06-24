@@ -8,19 +8,28 @@ namespace GraduationWebApp.Controllers
     public class ResourcesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private const int PageSize = 5;
 
         public ResourcesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Resources
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1)
         {
-            return View(await _context.Resources.ToListAsync());
+            var resources = await _context.Resources
+                .OrderBy(r => r.ResourceId)
+                .Skip((pageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToListAsync();
+
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)_context.Resources.Count() / PageSize);
+            ViewBag.IsAuthenticated = User.Identity.IsAuthenticated && (User.IsInRole("Психолог") || User.IsInRole("Админ"));
+
+            return View(resources);
         }
 
-        // GET: Resources/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -37,16 +46,11 @@ namespace GraduationWebApp.Controllers
 
             return View(resources);
         }
-
-        // GET: Resources/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Resources/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ResourceId,Name,Description,ResourceType,ResourceFile")] Resources resources)
@@ -60,7 +64,6 @@ namespace GraduationWebApp.Controllers
             return View(resources);
         }
 
-        // GET: Resources/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,9 +79,6 @@ namespace GraduationWebApp.Controllers
             return View(resources);
         }
 
-        // POST: Resources/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ResourceId,Name,Description,ResourceType,ResourceFile")] Resources resources)
@@ -111,7 +111,6 @@ namespace GraduationWebApp.Controllers
             return View(resources);
         }
 
-        // GET: Resources/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -129,7 +128,6 @@ namespace GraduationWebApp.Controllers
             return View(resources);
         }
 
-        // POST: Resources/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

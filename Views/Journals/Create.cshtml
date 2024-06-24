@@ -1,43 +1,28 @@
 ﻿@model GraduationWebApp.Models.Journals
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Добавить запись";
 }
 
-<h1>Create</h1>
+<h2>Добавить запись</h2>
 
-<h4>Journals</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <input asp-for="UserId" class="form-control" />
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EntryDate" class="control-label"></label>
-                <input asp-for="EntryDate" class="form-control" />
-                <span asp-validation-for="EntryDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Entry" class="control-label"></label>
-                <input asp-for="Entry" class="form-control" />
-                <span asp-validation-for="Entry" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Entry" class="control-label"></label>
+        <textarea asp-for="Entry" class="form-control"></textarea>
+        <span asp-validation-for="Entry" class="text-danger"></span>
     </div>
-</div>
+    <div class="form-group">
+        <input type="submit" value="Добавить" class="btn btn-primary" />
+    </div>
+</form>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="UserIndex">Назад к списку</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

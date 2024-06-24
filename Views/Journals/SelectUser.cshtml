@@ -1,16 +1,12 @@
 ﻿@model GraduationWebApp.Controllers.PaginatedList<GraduationWebApp.Models.Users>
 
 @{
-    ViewData["Title"] = "Пользователи";
+    ViewData["Title"] = "Выбор пользователя";
     int pageNumber = ViewBag.PageNumber;
     int totalPages = ViewBag.TotalPages;
 }
 
-<h1>Пользователи</h1>
-
-<p>
-    <a asp-action="Create" class="btn btn-dark text-white">Добавить пользователя</a>
-</p>
+<h2>Выбор пользователя</h2>
 
 <div class="table-responsive">
     <table class="table table-dark table-hover table-bordered">
@@ -19,9 +15,6 @@
                 <th>Имя</th>
                 <th>Фамилия</th>
                 <th>Email</th>
-                <th>Пароль</th>
-                <th>Роль</th>
-                <th>Дата регистрации</th>
                 <th>Действия</th>
             </tr>
         </thead>
@@ -32,13 +25,8 @@
                     <td>@user.FirstName</td>
                     <td>@user.LastName</td>
                     <td>@user.Email</td>
-                    <td>@user.Password</td>
-                    <td>@user.Role</td>
-                    <td>@user.RegistrationDate.ToString("dd.MM.yyyy")</td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@user.UserId" class="btn btn-outline-success">Изменить</a> |
-                        <a asp-action="Details" asp-route-id="@user.UserId" class="btn btn-outline-success">Подробнее</a> |
-                        <a asp-action="Delete" asp-route-id="@user.UserId" class="btn btn-outline-danger">Удалить</a>
+                        <a asp-action="AdminIndex" asp-route-userId="@user.UserId" class="btn btn-primary">Просмотреть журнал</a>
                     </td>
                 </tr>
             }
@@ -53,19 +41,19 @@
             @if (Model.HasPreviousPage)
             {
                 <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber - 1)">Назад</a>
+                    <a class="page-link" asp-action="SelectUser" asp-route-pageNumber="@(pageNumber - 1)">Назад</a>
                 </li>
             }
             @for (int i = 1; i <= totalPages; i++)
             {
                 <li class="page-item @(i == pageNumber ? "active" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@i">@i</a>
+                    <a class="page-link" asp-action="SelectUser" asp-route-pageNumber="@i">@i</a>
                 </li>
             }
             @if (Model.HasNextPage)
             {
                 <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(pageNumber + 1)">Вперед</a>
+                    <a class="page-link" asp-action="SelectUser" asp-route-pageNumber="@(pageNumber + 1)">Вперед</a>
                 </li>
             }
         </ul>

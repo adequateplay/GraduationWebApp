@@ -1,0 +1,43 @@
+﻿@model IEnumerable<GraduationWebApp.Models.Groups>
+
+@{
+    ViewData["Title"] = "Календарь";
+    int pageNumber = ViewBag.PageNumber;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<h1>Календарь</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <ul class="list-group" id="group-list">
+                @foreach (var item in Model)
+                {
+                    <li class="list-group-item group-item" data-group-id="@item.GroupId" data-start="@item.StartDate.ToString("yyyy-MM-dd")" data-end="@item.EndDate.ToString("yyyy-MM-dd")">
+                        <h5>@item.Name</h5>
+                        <p>@item.Description</p>
+                        <p>Дата начала: @item.StartDate.ToString("dd.MM.yyyy")</p>
+                        <p>Дата конца: @item.EndDate.ToString("dd.MM.yyyy")</p>
+                    </li>
+                }
+            </ul>
+            @if (totalPages > 1)
+            {
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == pageNumber ? "active" : "")">
+                                <a class="page-link" asp-action="Calendar" asp-route-pageNumber="@i">@i</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+        <div class="col-md-4">
+            <div id="calendar"></div>
+        </div>
+    </div>
+</div>

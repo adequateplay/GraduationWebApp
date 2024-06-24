@@ -1,13 +1,20 @@
 ﻿using GraduationWebApp.Data;
 using GraduationWebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace GraduationWebApp.Controllers
 {
+    [Authorize(Roles = "Психолог")]
     public class SessionsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private const int PageSize = 5;
 
         public SessionsController(ApplicationDbContext context)
         {
@@ -15,9 +22,19 @@ namespace GraduationWebApp.Controllers
         }
 
         // GET: Sessions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1)
         {
-            return View(await _context.Sessions.ToListAsync());
+            var sessions = await _context.Sessions
+                .Include(s => s.Group)
+                .OrderBy(s => s.SessionDate)
+                .Skip((pageNumber - 1) * PageSize)
+                .Take(PageSize)
+                .ToListAsync();
+
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)_context.Sessions.Count() / PageSize);
+
+            return View(sessions);
         }
 
         // GET: Sessions/Details/5
@@ -28,36 +45,39 @@ namespace GraduationWebApp.Controllers
                 return NotFound();
             }
 
-            var sessions = await _context.Sessions
+            var session = await _context.Sessions
+                .Include(s => s.Group)
                 .FirstOrDefaultAsync(m => m.SessionId == id);
-            if (sessions == null)
+            if (session == null)
             {
                 return NotFound();
             }
 
-            return View(sessions);
+            return View(session);
         }
 
         // GET: Sessions/Create
         public IActionResult Create()
         {
+            ViewData["Groups"] = new SelectList(_context.Groups, "GroupId", "Name");
             return View();
         }
 
         // POST: Sessions/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SessionId,GroupId,SessionDate,StartTime,EndTime")] Sessions sessions)
+        public async Task<IActionResult> Create([Bind("SessionId,GroupId,SessionDate,StartTime,EndTime")] Sessions session, string GroupName)
         {
+            session.GroupId = _context.Groups.FirstOrDefault(g => g.Name == GroupName)?.GroupId;
+
             if (ModelState.IsValid)
             {
-                _context.Add(sessions);
+                _context.Add(session);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(sessions);
+            ViewData["Groups"] = new SelectList(_context.Groups, "GroupId", "Name", session.GroupId);
+            return View(session);
         }
 
         // GET: Sessions/Edit/5
@@ -68,22 +88,23 @@ namespace GraduationWebApp.Controllers
                 return NotFound();
             }
 
-            var sessions = await _context.Sessions.FindAsync(id);
-            if (sessions == null)
+            var session = await _context.Sessions.FindAsync(id);
+            if (session == null)
             {
                 return NotFound();
             }
-            return View(sessions);
+            ViewData["Groups"] = new SelectList(_context.Groups, "GroupId", "Name", session.GroupId);
+            return View(session);
         }
 
         // POST: Sessions/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("SessionId,GroupId,SessionDate,StartTime,EndTime")] Sessions sessions)
+        public async Task<IActionResult> Edit(int id, [Bind("SessionId,GroupId,SessionDate,StartTime,EndTime")] Sessions session, string GroupName)
         {
-            if (id != sessions.SessionId)
+            session.GroupId = _context.Groups.FirstOrDefault(g => g.Name == GroupName)?.GroupId;
+
+            if (id != session.SessionId)
             {
                 return NotFound();
             }
@@ -92,12 +113,12 @@ namespace GraduationWebApp.Controllers
             {
                 try
                 {
-                    _context.Update(sessions);
+                    _context.Update(session);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SessionsExists(sessions.SessionId))
+                    if (!SessionExists(session.SessionId))
                     {
                         return NotFound();
                     }
@@ -108,43 +129,11 @@ namespace GraduationWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(sessions);
+            ViewData["Groups"] = new SelectList(_context.Groups, "GroupId", "Name", session.GroupId);
+            return View(session);
         }
 
-        // GET: Sessions/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var sessions = await _context.Sessions
-                .FirstOrDefaultAsync(m => m.SessionId == id);
-            if (sessions == null)
-            {
-                return NotFound();
-            }
-
-            return View(sessions);
-        }
-
-        // POST: Sessions/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var sessions = await _context.Sessions.FindAsync(id);
-            if (sessions != null)
-            {
-                _context.Sessions.Remove(sessions);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool SessionsExists(int id)
+        private bool SessionExists(int id)
         {
             return _context.Sessions.Any(e => e.SessionId == id);
         }

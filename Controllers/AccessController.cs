@@ -1,65 +1,75 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
-using System.Security.Claims;
+﻿using GraduationWebApp.Data;
 using GraduationWebApp.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.EntityFrameworkCore;
-using GraduationWebApp.Data;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
-namespace GraduationWebApp.Controllers
+public class AccessController : Controller
 {
-    public class AccessController : Controller
+    private readonly ApplicationDbContext _context;
+
+    public AccessController(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
-        public AccessController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-        [HttpGet]
-        public IActionResult Login()
-        {
-            ClaimsPrincipal claimUser = HttpContext.User;
-            if (claimUser.Identity.IsAuthenticated)
-                return RedirectToAction("Index", "Home");
+        _context = context;
+    }
 
+    [HttpGet]
+    public IActionResult Login()
+    {
+        ClaimsPrincipal claimUser = HttpContext.User;
+        if (claimUser.Identity.IsAuthenticated)
+            return RedirectToAction("Index", "Home");
 
+        return View();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> Login(Users model)
+    {
+        // Проверка на данные хостинга
+        if (model.Email == "11183693" && model.Password == "60-dayfreetrial")
+        {
+            ViewData["ValidateMessage"] = "Invalid user credentials.";
             return View();
         }
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login(Users model)
-        {
-            var user = _context.Users.FirstOrDefault(u => u.Email == model.Email && u.Password == model.Password);
 
-            if (user != null)
+        var user = _context.Users.FirstOrDefault(u => u.Email == model.Email && u.Password == model.Password);
+
+        if (user != null)
+        {
+            List<Claim> claims = new List<Claim>() {
+                new Claim(ClaimTypes.Name, model.Email),
+                new Claim(ClaimTypes.NameIdentifier, model.Email),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            AuthenticationProperties properties = new AuthenticationProperties()
             {
-                List<Claim> claims = new List<Claim>() {
-            new Claim(ClaimTypes.NameIdentifier, model.Email),
-            new Claim(ClaimTypes.Role, user.Role) // Получаем значение роли из базы данных
+                AllowRefresh = true,
+                IsPersistent = true, // Ensure persistent login
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30) // Custom expiration time
+            };
 
-        };
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), properties);
 
-                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims,
-                    CookieAuthenticationDefaults.AuthenticationScheme);
-
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity));
-
-                return RedirectToAction("Index", "Home");
-            }
-
-            ViewData["ValidateMessage"] = "User not found";
-            return View();
+            return RedirectToAction("Index", "Home");
         }
 
+        ViewData["ValidateMessage"] = "Пользователь не найден";
+        return View();
+    }
 
-
-
+    [HttpPost]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToAction("Login", "Access");
     }
 }

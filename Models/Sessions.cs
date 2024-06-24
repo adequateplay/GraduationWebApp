@@ -1,16 +1,28 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GraduationWebApp.Models
 {
     public partial class Sessions
     {
         public Sessions() { }
+
         [Key]
         public int SessionId { get; set; }
-        public Nullable<int> GroupId { get; set; }
-        public System.DateTime SessionDate { get; set; }
-        public System.TimeSpan StartTime { get; set; }
-        public System.TimeSpan EndTime { get; set; }
 
+        [ForeignKey("Group")]
+        public int? GroupId { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime SessionDate { get; set; }
+
+        [DataType(DataType.Time)]
+        public TimeSpan StartTime { get; set; }
+
+        [DataType(DataType.Time)]
+        public TimeSpan EndTime { get; set; }
+
+        public virtual Groups Group { get; set; }
     }
 }

@@ -28,6 +28,58 @@ body {
     margin-top: 10px;
     margin-left: 10px;
 }
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+#authcard {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
 header {
     margin-top: 80px;
 }
+#calendar {
+    max-width: 100%;
+    margin: 0 auto;
+    background-color: #343a40;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    color: white;
+}
+
+.list-group-item {
+    margin-bottom: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 15px; /* Добавлен отступ для элементов групп */
+}
+
+.pagination {
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.fc-today {
+    background-color: #007bff !important;
+    color: #fff !important;
+}
+.fc-highlight {
+    background-color: #007bff !important;
+    color: #fff !important;
+}
+
+
+
+.page-link {
+    border: 1px solid #fff !important; /* Добавлен контур для элементов пагинации */
+}
+
+
+

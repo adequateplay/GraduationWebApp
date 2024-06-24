@@ -1,10 +1,10 @@
 ﻿@model GraduationWebApp.Models.Users
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Изменение";
 }
 
-<h1>Edit</h1>
+<h1>Редактирование пользователя</h1>
 
 <h4>Users</h4>
 <hr />
@@ -35,25 +35,27 @@
             </div>
             <div class="form-group">
                 <label asp-for="Role" class="control-label"></label>
-                <input asp-for="Role" class="form-control" />
+                <select asp-for="Role" class="form-control" asp-items="ViewBag.Roles"></select>
                 <span asp-validation-for="Role" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RegistrationDate" class="control-label"></label>
-                <input asp-for="RegistrationDate" class="form-control" />
+                <input asp-for="RegistrationDate" class="form-control" type="date" />
                 <span asp-validation-for="RegistrationDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Сохранить" class="btn btn-primary mt-1" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Назад к списку</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
